@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//code.jquery.com/jquery.min.js"></script>
+        <title>HB test page</title>
+        <style>
+            input { width: 400px; }
+            textarea {
+                display: block;
+                width: 50%;
+                height: 500px;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="text" id="message" placeholder="Message" /><button>Send to HB</button>
+        <textarea id="response"></textarea>
+        <script>
+            $('button').on('click', function() {
+
+                $.ajax({
+                    url: 'index.php',
+                    data: {
+                        text: $('#message').val(),
+                        user_name: 'TESTER'
+                    },
+                    type: 'POST',
+                    dataType: 'json'
+                }).done(function(data) {
+                    $('#response').val(JSON.stringify(data));
+                }).fail(function(xhr) {
+                    $('#response').val(xhr.responseText);
+                });
+
+            });
+        </script>
+    </body>
+</html>
