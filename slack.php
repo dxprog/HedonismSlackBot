@@ -47,6 +47,13 @@ class Slack {
             }
         }
 
+        $message = new Model\Message;
+        $message->date = time();
+        $message->userId = $request->user_id;
+        $message->userName = $request->user_name;
+        $message->body = $request->text;
+        $message->sync();
+
     }
 
     private function _getRequest() {
