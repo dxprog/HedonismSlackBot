@@ -19,25 +19,25 @@ class Slack {
     }
 
     public static function autoloader($library) {
-        
+
         global $_apiPath;
-        
+
         $library = explode('\\', $library);
         $filePath = '.';
         foreach ($library as $piece) {
             $filePath .= '/' . strtolower($piece);
         }
         $filePath .= '.php';
-        
+
         if (is_readable($filePath)) {
             require_once($filePath);
         }
-        
+
     }
 
     public function process() {
 
-        $request = $this->_getRequest();
+        $request = $this->getRequest();
 
         if ($request->text && $request->text{0} === TRIGGER_CHARACTER) {
             $tokens = explode(' ', $request->text);
@@ -57,9 +57,9 @@ class Slack {
         }
     }
 
-    private function _getRequest() {
+    public function getRequest() {
         $retVal = new stdClass;
-        
+
         if ($_POST) {
             foreach ($_POST as $key => $val) {
                 $retVal->$key = $val;
