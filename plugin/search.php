@@ -22,7 +22,7 @@ namespace Plugin {
             $phrase = trim(implode(' ', $params));
             if (strlen($phrase)) {
                 $params = [ ':phrase' => '%' . $phrase . '%' ];
-                $query = 'SELECT * FROM messages WHERE message_body LIKE :phrase';
+                $query = 'SELECT * FROM messages WHERE message_body LIKE :phrase AND message_body NOT LIKE ":search%" AND message_user_name != "slackbot"';
                 if ($user) {
                     $params[':user'] = $user;
                     $query .= ' AND message_user_name = :user';

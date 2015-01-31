@@ -47,7 +47,7 @@ class Slack {
             }
         }
 
-        if (isset($request->user_id)) {
+        if (isset($request->user_id) && $message->user_name !== 'slackbot') {
             $message = new Model\Message;
             $message->date = time();
             $message->userId = $request->user_id;
