@@ -37,7 +37,8 @@ namespace Plugin {
                         $out = [];
                         $afterHours = [];
                         foreach ($data as $info) {
-                            $out[] = '*' . $info->t . '* - ' . $info->l_cur . ' (' . $info->c . ')';
+                            $emoji = (float) $info->c > 0 ? ':green_heart:' : ':broken_heart:';
+                            $out[] = $emoji . ' *' . $info->t . '* - ' . $info->l_cur . ' (' . $info->c . ')';
                             if (isset($info->el_cur) && $info->el_cur) {
                                 $afterHours[] = '*' . $info->t . '* - ' . $info->el_cur;
                             }
