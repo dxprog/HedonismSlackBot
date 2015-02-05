@@ -35,11 +35,19 @@ namespace Plugin {
                     if ($data) {
 
                         $out = [];
+                        $afterHours = [];
                         foreach ($data as $info) {
                             $out[] = '*' . $info->t . '* - ' . $info->l_cur . ' (' . $info->c . ')';
+                            if (isset($info->el_cur) && $info->el_cur) {
+                                $afterHours[] = '*' . $info->t . '* - ' . $info->el_cur;
+                            }
                         }
 
-                        $slack->respond(implode(' | ', $out));
+                        $out = implode(' | ', $out);
+                        if (count($afterHours)) {
+                            $out .= PHP_EOL . 'After hours: ' . implode(' | ', $afterHours);
+                        }
+                        $slack->respond($out);
 
                     }
                 } else {
