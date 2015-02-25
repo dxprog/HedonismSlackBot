@@ -11,6 +11,9 @@ namespace Plugin {
 
         public static function trigger($slack, $params) {
 
+            $minDate = date('U');
+            $header = 'Yesterday\'s stats: ';
+
             if (is_array($params) && count($params)) {
                 switch ($params[0]) {
                     case 'phrases':
@@ -20,13 +23,18 @@ namespace Plugin {
                         array_shift($params);
                         self::findPhrase($slack, $params);
                         break;
+                    default:
+                        $time = strtotime($params[0]);
+                        $minDate = $time !== false ? $time : $minDate;
+                        $header = 'Stats for ' . date('F j, Y', $minDate);
+                        break;
                 }
             }
 
-            $minDate = strtotime(date('Y/m/d'));
-            $result = Lib\Db::Query('SELECT COUNT(1) AS total, message_user_name, SUM(LENGTH(message_body)) AS characters FROM messages WHERE message_date >= :minDate AND message_user_name != "slackbot" GROUP BY message_user_name', [ ':minDate' => $minDate ]);
+            $maxDate = $minDate + 86400;
+            $result = Lib\Db::Query('SELECT COUNT(1) AS total, message_user_name, SUM(LENGTH(message_body)) AS characters FROM messages WHERE message_date BETWEEN :minDate AND :maxDate AND message_user_name != "slackbot" GROUP BY message_user_name', [ ':minDate' => $minDate, ':maxDate' => $maxDate ]);
             if ($result && $result->count) {
-                $out = 'Today\'s stats: ' . PHP_EOL;
+                $out = $header . PHP_EOL;
                 $total = 0;
                 $users = [];
                 while ($row = Lib\Db::Fetch($result)) {
@@ -63,11 +71,11 @@ namespace Plugin {
 
             if ($data) {
                 $phrases = self::_getCommonPhrases($data);
-                
+
                 $out = [];
                 $i = 0;
                 foreach ($phrases as $phrase => $count) {
-                    
+
                     $out[] = '*' . $phrase . '* - ' . $count;
 
                     $i++;
