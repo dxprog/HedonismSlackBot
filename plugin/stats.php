@@ -26,10 +26,11 @@ namespace Plugin {
                         break;
                     default:
 
-                        $timePieces = [ $params[0] ];
+                        $params = implode(' ', $params);
+                        $timePieces = [ $params ];
 
-                        if (strpos($params[0], '-') !== false) {
-                            $timePieces = explode('-', $params[0]);
+                        if (strpos($params, ' - ') !== false) {
+                            $timePieces = explode(' - ', $params);
                         }
 
                         $time = strtotime($timePieces[0]);
@@ -37,7 +38,7 @@ namespace Plugin {
                         $maxDate = $minDate + 86400;
                         $header = 'Stats for ' . date('F j, Y', $minDate);
 
-                        if (false !== $min && count($timePieces) === 2) {
+                        if (false !== $time && count($timePieces) === 2) {
                             $time = strtotime($timePieces[1]);
                             $maxDate = $time !== false ? $time : $maxDate;
                             $header .= ' to ' . date('F j, Y', $maxDate);
