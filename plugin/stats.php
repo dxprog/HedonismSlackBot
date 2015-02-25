@@ -13,6 +13,7 @@ namespace Plugin {
 
             $minDate = date('U');
             $header = 'Yesterday\'s stats: ';
+            $maxDate = $minDate + 86400;
 
             if (is_array($params) && count($params)) {
                 switch ($params[0]) {
@@ -24,14 +25,29 @@ namespace Plugin {
                         self::findPhrase($slack, $params);
                         break;
                     default:
-                        $time = strtotime($params[0]);
+
+                        $timePieces = [ $params[0] ];
+
+                        if (strpos($params[0], '-') !== false) {
+                            $timePieces = explode('-', $params[0]);
+                        }
+
+                        $time = strtotime($timePieces[0]);
                         $minDate = $time !== false ? $time : $minDate;
+                        $maxDate = $minDate + 86400;
                         $header = 'Stats for ' . date('F j, Y', $minDate);
+
+                        if (false !== $min && count($timePieces) === 2) {
+                            $time = strtotime($timePieces[1]);
+                            $maxDate = $time !== false ? $time : $maxDate;
+                            $header .= ' to ' . date('F j, Y', $maxDate);
+                        }
+
                         break;
                 }
             }
 
-            $maxDate = $minDate + 86400;
+
             $result = Lib\Db::Query('SELECT COUNT(1) AS total, message_user_name, SUM(LENGTH(message_body)) AS characters FROM messages WHERE message_date BETWEEN :minDate AND :maxDate AND message_user_name != "slackbot" GROUP BY message_user_name', [ ':minDate' => $minDate, ':maxDate' => $maxDate ]);
             if ($result && $result->count) {
                 $out = $header . PHP_EOL;
