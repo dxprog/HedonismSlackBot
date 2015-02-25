@@ -59,6 +59,11 @@ namespace Plugin {
                 }
                 $out .= 'Chracters sent: ' . $total . PHP_EOL;
                 $breakdown = [];
+
+                uasort($users, function($a, $b) {
+                    return $a > $b ? -1 : 1;
+                });
+
                 foreach ($users as $user => $count) {
                     $breakdown[] = '*' . $user . '*: ' . $count . ' (' . round($count / $total * 100) . '%)';
                 }
