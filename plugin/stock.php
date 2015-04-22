@@ -52,7 +52,7 @@ namespace Plugin {
             curl_multi_close($mh);
 
             if (count($out) > 0) {
-                $slack->respond(implode(' | ', $out));
+                $slack->respond(implode(PHP_EOL, $out));
             }
 
         }
