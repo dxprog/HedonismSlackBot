@@ -60,8 +60,11 @@ namespace Plugin {
         private static function _processStockRequest($mh, $request) {
             $dataContent = json_decode(curl_multi_getcontent($request->dataRequest));
             curl_multi_remove_handle($mh, $request->dataRequest);
-
-            return ($dataContent->Change > 0 ? ':green_heart:' : ':broken_heart:') . ' *' . $request->symbol . '* - ' . $dataContent->LastPrice . ' (' . round($dataContent->Change, 2) . ')';
+            $retVal = $request->symbol . ' - Invalid symbol';
+            if (isset($dataContent->Change)) {
+                $retVal = ($dataContent->Change > 0 ? ':green_heart:' : ':broken_heart:') . ' *' . $request->symbol . '* - ' . $dataContent->LastPrice . ' (' . round($dataContent->Change, 2) . ')';
+            }
+            return $retVal;
         }
 
         private static function _createRequest($url) {
