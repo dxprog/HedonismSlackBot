@@ -24,7 +24,7 @@ namespace Plugin {
             // Sanitize the array and start building up requests
             $requests = [];
             foreach($stocks as $stock) {
-                if (preg_match('/^[A-Za-z]+$/', $stock)) {
+                if (preg_match('/^[A-Za-z\.]+$/', $stock)) {
                     $request = self::_createStockRequest($stock);
                     curl_multi_add_handle($mh, $request->dataRequest);
                     $requests[] = $request;
