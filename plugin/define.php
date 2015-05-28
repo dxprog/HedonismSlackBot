@@ -20,7 +20,8 @@ namespace Plugin {
                 if (isset($data->responseData) && count($data->responseData->results)) {
                   $result = $data->responseData->results[0];
                   $out = '*' . $result->titleNoFormatting . '*' . PHP_EOL;
-                  $out .= str_replace([ '<b>', '</b>' ], '_', $result->content);
+                  $out .= str_replace([ '<b>', '</b>' ], '_', trim($result->content));
+                  $out .= PHP_EOL . 'View full definition: ' . $result->url . ')';
                   $slack->respond($out);
                 }
               }
