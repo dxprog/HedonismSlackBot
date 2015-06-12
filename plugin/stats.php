@@ -238,7 +238,7 @@ namespace Plugin {
             $retVal = htmlspecialchars_decode($retVal);
             $retVal = preg_replace('/http[s]?\:\/\/[^\s]+/', '', $retVal); // remove links
             $retVal = preg_replace($stop, '', $retVal);
-            $retVal = str_replace(array ('.', '>', '<', '\'', '|', '[', ']', '(', ')', '{', '}', '!', '@', '#', '$', '%', '^', '&', '*', '?', '"', ':', ',', '_'), ' ', $retVal);
+            $retVal = str_replace(array ('.', '>', '<', '\'', '|', '[', ']', '(', ')', '{', '}', '!', '@', '#', '$', '%', '^', '&', '*', '?', '"', ':', ',', '_', '’'), ' ', $retVal);
             $retVal = str_replace ('  ', ' ', $retVal);
 
             // Remove duplicate words, clean up spaces
