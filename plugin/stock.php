@@ -14,10 +14,28 @@ namespace Plugin {
             'TWTR'
         ];
 
+        private static $_hakkumanDefaults = [
+            'AAPL',
+            'FIT',
+            'FB',
+            'LNKD',
+            'PSX',
+            'SCTY',
+            'NFLX',
+            'TSLA',
+            'WMT'
+        ];
+
         public static function trigger($slack, $params) {
 
             $stocks = count($params) ? $params : self::$_defaultStocks;
             $stocks = !is_array($stocks) ? [ $stocks ] : $stocks;
+
+            for ($i = 0, $count = count($stocks); $i < $count; $i++) {
+                if ($stocks[$i] === 'hakkuman') {
+                    array_splice($stocks, $i, 1, self::$_hakkumanDefaults);
+                }
+            }
 
             $mh = curl_multi_init();
 
