@@ -1,1 +1,1 @@
-default|AAPL|F|FB|GOOG|LNKD|TSLA|TWTR
+{"default":["AAPL","F","FB","GOOG","LNKD","TSLA","TWTR"]}

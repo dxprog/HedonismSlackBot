@@ -29,7 +29,7 @@ namespace Plugin {
             }
 
             if (!$stocksToRetrieve) {
-                $stocksToRetrieve = self::_getUserStocks($slack, $stocks);
+                $stocksToRetrieve = self::_getUserStocks();
             }
 
             $mh = curl_multi_init();
@@ -103,50 +103,44 @@ namespace Plugin {
          */
         private static function _readStockPreferences() {
             $retVal = [];
-            $stocks = file(STOCK_FILE_LOCATION);
-            if ($stocks) {
-                foreach ($stocks as $user) {
-                    $tokens = explode('|', $user);
-                    $key = array_shift($tokens);
-                    $retVal[$key] = $tokens;
-                }
-            }
-            self::_$stocks = $retVal;
-            return $retVal;
+            $stocks = file_get_contents(self::STOCK_FILE_LOCATION);
+            self::$_stocks = json_decode($stocks);
+            return self::$_stocks;
+        }
+
+        /**
+         * Returns the user ID of the current request
+         */
+        private static function _getUserId() {
+            $request = \Slack::getSlack()->getRequest();
+            return isset($request->user_id) ? $request->user_id : 'default';
         }
 
         /**
          * Returns the stocks for a user. If the user doesn't have any preferences, copies default
          */
-        private static function _getUserStocks($slack) {
-            $request = $slack->getRequest();
-            return isset($request->user_id) && isset(self::$_stocks[$request->user_id]) ? $stocks[$request->user_id] : array_slice(self::$_stocks['default'], 0);
+        private static function _getUserStocks() {
+            $userId = self::_getUserId();
+            return isset(self::$_stocks[$userId]) ? self::$_stocks[$userId] : array_slice(self::$_stocks['default'], 0);
         }
 
         /**
          * Updates a user's stock preferences and saves them
          */
-        private static function _setUserStocks($slack, $stocks) {
-            $request = $slack->getRequest();
-            if (isset($request->user_id)) {
-                self::$_stocks[$request->user_id] = $stocks;
-            }
-
-            $out = '';
-            foreach (self::$_stocks as $user => $stocks) {
-                $out .= $user . '|' . implode('|', $stocks) . PHP_EOL;
-            }
-
-            return file_put_contents(STOCK_FILE_LOCATION, $out);
+        private static function _setUserStocks($stocks) {
+            $userId = self::_getUserId();
+            self::$_stocks[$userId] = $stocks;
+            return file_put_contents(self::STOCK_FILE_LOCATION, json_encode(self::$_stocks));
         }
 
         /**
          * Adds stocks to a user's preferences
          */
         private static function _addUserStocks($slack, $stocks) {
-            $userStocks = self::_getUserStocks($slack, self::$_stocks);
+            $stocks = array_map('strtoupper', $stocks);
+            $userStocks = self::_getUserStocks();
             $userStocks = array_unique(array_merge($userStocks, $stocks));
-            if (self::_setUserStocks($slack, $userStocks)) {
+            if (self::_setUserStocks($userStocks)) {
                 $slack->respond('Stocks have been added to your preferences');
             } else {
                 $slack->respond('Dammit, something went wrong...');
@@ -157,9 +151,9 @@ namespace Plugin {
          * Removes stocks from a user's preferences
          */
         private static function _removeUserStocks($slack, $stocks) {
-            $userStocks = self::_getUserStocks($slack, self::$_stocks);
+            $userStocks = self::_getUserStocks(self::$_stocks);
             $userStocks = array_unique(array_merge($userStocks, $stocks));
-            if (self::_setUserStocks($slack, $userStocks)) {
+            if (self::_setUserStocks($userStocks)) {
                 $slack->respond('Stocks have been added to your portfolio');
             } else {
                 $slack->respond('Dammit, something went wrong...');
