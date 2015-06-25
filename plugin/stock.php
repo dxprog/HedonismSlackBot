@@ -104,7 +104,7 @@ namespace Plugin {
         private static function _readStockPreferences() {
             $retVal = [];
             $stocks = file_get_contents(self::STOCK_FILE_LOCATION);
-            self::$_stocks = json_decode($stocks);
+            self::$_stocks = (array) json_decode($stocks);
             return self::$_stocks;
         }
 
@@ -151,10 +151,11 @@ namespace Plugin {
          * Removes stocks from a user's preferences
          */
         private static function _removeUserStocks($slack, $stocks) {
+            $stocks = array_map('strtoupper', $stocks);
             $userStocks = self::_getUserStocks(self::$_stocks);
-            $userStocks = array_unique(array_merge($userStocks, $stocks));
+            $userStocks = array_diff($userStocks, $stocks);
             if (self::_setUserStocks($userStocks)) {
-                $slack->respond('Stocks have been added to your portfolio');
+                $slack->respond('Stocks have been removed from your portfolio');
             } else {
                 $slack->respond('Dammit, something went wrong...');
             }
