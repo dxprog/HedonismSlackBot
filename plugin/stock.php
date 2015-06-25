@@ -153,8 +153,15 @@ namespace Plugin {
         private static function _removeUserStocks($slack, $stocks) {
             $stocks = array_map('strtoupper', $stocks);
             $userStocks = self::_getUserStocks(self::$_stocks);
-            $userStocks = array_diff($userStocks, $stocks);
-            if (self::_setUserStocks($userStocks)) {
+            
+            $newStocks = [];
+            foreach ($userStocks as $stock) {
+                if (!in_array($stock, $stocks)) {
+                    $newStocks[] = $stock;
+                }
+            }
+
+            if (self::_setUserStocks($newStocks)) {
                 $slack->respond('Stocks have been removed from your portfolio');
             } else {
                 $slack->respond('Dammit, something went wrong...');
