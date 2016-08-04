@@ -47,12 +47,14 @@ class Slack {
             }
         }
 
-        if (isset($request->user_id) && $message->user_name !== 'slackbot') {
+        if (isset($request->user_id) && $request->user_name !== 'slackbot') {
             $message = new Model\Message;
             $message->date = time();
             $message->userId = $request->user_id;
             $message->userName = $request->user_name;
             $message->body = $request->text;
+            $message->team = $request->team_domain;
+            $message->channel = $request->channel_name;
             $message->sync();
         }
     }

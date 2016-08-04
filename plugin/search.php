@@ -38,8 +38,9 @@ namespace Plugin {
         }
 
         private static function _doStandardSearch($phrase, $user, \Slack $slack) {
-            $params = [ ':phrase' => '%' . $phrase . '%' ];
-            $query = 'SELECT * FROM messages WHERE message_body LIKE :phrase AND message_body NOT LIKE ":search%" AND message_user_name != "slackbot"';
+            $request = $slack->getRequest();
+            $params = [ ':phrase' => '%' . $phrase . '%', ':team' => $request->team_domain, ':channel' => $request->channel_name ];
+            $query = 'SELECT * FROM messages WHERE message_body LIKE :phrase AND message_body NOT LIKE ":search%" AND message_user_name != "slackbot" AND message_team = :team AND message_channel = :channel';
             if ($user) {
                 $params[':user'] = $user;
                 $query .= ' AND message_user_id = :user';
@@ -58,12 +59,13 @@ namespace Plugin {
         }
 
         private static function _doDateSearch($phrase, \Slack $slack) {
+            $request = $slack->getRequest();
             preg_match(self::DATE_REGEX, $phrase, $matches);
             $startDate = strtotime($matches[1]);
             $endDate = strtotime($matches[2]);
-            $query = 'SELECT * FROM messages WHERE message_date BETWEEN :startDate AND :endDate';
+            $query = 'SELECT * FROM messages WHERE message_date BETWEEN :startDate AND :endDate AND message_team = :team AND message_channel = :channel';
 
-            $result = Lib\Db::Query($query, [ ':startDate' => $startDate, 'endDate' => $endDate ]);
+            $result = Lib\Db::Query($query, [ ':startDate' => $startDate, 'endDate' => $endDate, ':team' => $request->team_domain, ':channel' => $request->channel_name ]);
             if ($result && $result->count) {
                 $out = [ '**Found ' . $result->count . ' results:**' ];
                 if ($result->count > self::MAX_DATE_MESSAGES) {
