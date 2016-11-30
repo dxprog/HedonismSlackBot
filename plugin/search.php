@@ -102,7 +102,7 @@ namespace Plugin {
         }
 
         private static function _formatMessage($dbRow) {
-            return '"' . $dbRow->message_body . '" - ' . $dbRow->message_user_name . ', ' . date('F j, Y g:ia', $dbRow->message_date);
+            return '[' . date('Y-m-d h:i:sa', $dbRow->message_date) . '] *' . $dbRow->message_user_name . '*: ' . $dbRow->message_body . '  _(' . base_convert($dbRow->message_id, 10, 36) . ')_';
         }
 
     }
