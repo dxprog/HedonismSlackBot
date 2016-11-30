@@ -267,9 +267,6 @@ namespace Lib {
             $retVal = null;
             if (self::_verifyProperties($this)) {
                 if (is_numeric($id)) {
-                    $cacheKey = $this->_dbTable . '_getById_' . $id;
-                    $retVal = Cache::Get($cacheKey);
-
                     if (!$retVal) {
                         $query  = 'SELECT `' . implode('`, `', $this->_dbMap) . '` FROM `' . $this->_dbTable . '` ';
                         $query .= 'WHERE `' . $this->_dbMap[$this->_dbPrimaryKey] . '` = :id LIMIT 1';
@@ -278,7 +275,6 @@ namespace Lib {
                         if (null !== $result && $result->count === 1) {
                             $this->copyFromDbRow(Db::Fetch($result));
                         }
-                        Cache::Set($cacheKey, $retVal);
                     }
                 } else {
                     throw new Exception('ID must be a number');
